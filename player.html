@@ -1,0 +1,1391 @@
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Chrome, Firefox OS and Opera -->
+  <meta name="theme-color" content="#ec1f55" />
+
+  <!-- Windows Phone -->
+  <meta name="msapplication-navbutton-color" content="#ec1f55" />
+
+  <!-- iOS Safari -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="#ec1f55" />
+  <title>Music player</title>
+  <link rel="shortcut icon" class="favicon" href="6.jpg" type="image/x-icon" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"
+    integrity="sha512-HK5fgLBL+xu6dm/Ii3z4xhlSUyZgTT9tuc/hSrtw6uzJOvgRr2a9jyxxT1ely+B+xFAmJKVSTbpM/CuL7qxO8w=="
+    crossorigin="anonymous"
+  />
+  <link rel="preconnect" href="https://fonts.gstatic.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+    rel="stylesheet"
+  />
+  <!-- Intro.js CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/intro.js/minified/introjs.min.css"
+  />
+
+  <style>
+    :root {
+      --primary-color: #0b4e72;
+      --text-color: #f1ebeb;
+    }
+
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: inherit;
+    }
+
+    body {
+      /* background: rgba(210, 182, 255, 0.52); */
+      background: url(".png");
+      background-position: center;
+      object-fit: contain;
+      background-size: cover;
+    }
+
+    html {
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    .player {
+      position: relative;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .player .icon-pause {
+      display: none;
+    }
+
+    .player.playing .icon-pause {
+      display: inline-block;
+    }
+
+    .player.playing .icon-play {
+      display: none;
+    }
+
+    .dashboard {
+      margin: auto;
+      padding: 16px 16px 14px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      max-width: 480px;
+      z-index: 5;
+      border-bottom: 1px solid #ebebeb;
+
+      background-position: center;
+      background-size: auto;
+
+      background: rgba(219, 215, 227, 0.25);
+      border-radius: 16px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(4.7px);
+      -webkit-backdrop-filter: blur(4.7px);
+      border: 1px solid rgba(210, 182, 255, 0.78);
+    }
+
+    /* HEADER */
+    header {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    header h4 {
+      color: var(--primary-color);
+      font-size: 12px;
+    }
+
+    header h2 {
+      color: var(--text-color);
+      font-size: 20px;
+    }
+
+    /* CD */
+    .cd {
+      display: flex;
+      margin: auto;
+      width: 270px;
+      border: 13px solid #0b4e72;
+      border-radius: 30%;
+      border-radius: 132px;
+      background: rgba(231, 158, 225, 0.29);
+      box-shadow: 19px 19px 37px #b3b3b3, 15px 10px 60px #efa5b9;
+      -webkit-backdrop-filter: blur(5.3px);
+    }
+
+    .cd-thumb {
+      width: 100%;
+      padding-top: 100%;
+      border-radius: 50%;
+      background-color: #333;
+      background-size: cover;
+      margin: auto;
+      z-index: 5;
+    }
+
+    /* CONTROL */
+    .control {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 18px 0 8px 0;
+    }
+
+    .control .btn {
+      color: #666;
+      padding: 18px;
+      font-size: 18px;
+    }
+
+    .control .btn.active {
+      color: var(--primary-color);
+      border-radius: 132px;
+      background: linear-gradient(145deg, #f0f0f0, #cacaca);
+      box-shadow: 19px 19px 37px #b3b3b3, -19px -19px 37px #ffffff;
+    }
+
+    .control .btn-toggle-play {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      font-size: 24px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--primary-color);
+    }
+
+    .progress {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 6px;
+      background: #d3d3d3;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: 0.2s;
+      transition: opacity 0.2s;
+    }
+
+    .progress::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 6px;
+      background-color: var(--primary-color);
+      cursor: pointer;
+    }
+
+    /* PLAYLIST */
+    .playlist {
+      margin-top: 408px;
+      padding: 12px;
+    }
+
+    .song {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+
+      /* background-color: #fff; */
+      background: rgba(255, 255, 255, 0.45);
+      border-radius: 16px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(4.7px);
+      -webkit-backdrop-filter: blur(4.7px);
+      border: 1px solid rgba(210, 182, 255, 0.78);
+      padding: 8px 16px;
+      border-radius: 5px;
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .song.active {
+      background-color: var(--primary-color);
+      scale: 1.05;
+      z-index: -5; /* From https://css.glass */
+      background: var(--primary-color);
+      border-radius: 11px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(5.3px);
+      -webkit-backdrop-filter: blur(5.3px);
+      border: 1px solid #0b4e72;
+    }
+
+    .song:active {
+      opacity: 0.8;
+    }
+
+    .song.active .option,
+    .song.active .author,
+    .song.active .title {
+      color: #fff;
+    }
+
+    .song .thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-size: cover;
+      margin: 0 8px;
+    }
+
+    .song.active .thumb {
+      border: 3px double rgb(235, 178, 178);
+    }
+
+    .song .body {
+      flex: 1;
+      padding: 0 16px;
+    }
+
+    .song .title {
+      font-size: 18px;
+      color: #0b4e72;
+    }
+
+    .song .author {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .song .option {
+      padding: 16px 8px;
+      color: #999;
+      font-size: 18px;
+    }
+
+    .introjs-tooltip {
+      background-color: #0b4e72;
+      border: 2px solid rgba(12, 135, 121, 0.47);
+      color: #f5f5dc;
+      font-family: "Almendra SC", cursive !important;
+
+      border-radius: 16px;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 15px rgba(11, 179, 159, 0.607);
+    }
+
+    .introjs-tooltip-title {
+      color: #f9d923;
+      font-size: 22px;
+    }
+
+    .introjs-tooltiptext {
+      color: #dadada;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+
+    .introjs-helperLayer,
+    .introjs-tooltipReferenceLayer {
+      z-index: 99999 !important; /* Ensure they're not hidden */
+    }
+
+    .introjs-overlay {
+      background: rgba(25, 168, 168, 0.6) !important;
+      z-index: 99998 !important;
+    }
+
+    .introjs-donebutton,
+    .introjs-nextbutton,
+    .introjs-prevbutton {
+      color: white;
+      font-family: "Almendra SC", serif;
+      font-size: 16px;
+      transition: all 0.5s;
+      /* From https://css.glass */
+      background: rgba(102, 161, 152, 0.47);
+      border-radius: 16px;
+      box-shadow: 0 1px 40px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: 1px solid rgba(102, 161, 152, 0.93);
+    }
+
+    .introjs-donebutton:hover {
+      background-color: rgba(162, 171, 170, 0.47);
+
+      color: rgba(102, 161, 152, 0.47);
+    }
+
+    /* .btn-nextpage {
+      position: absolute;
+      left: 50%;
+      
+      transform: translate(-50%,-50%);
+      margin: 20px 0px;
+       
+      color: #ec1f55;
+      
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+
+      background-color: #ebebeb;
+      background: rgba(255, 255, 255, 0.45);
+      border-radius: 16px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(4.7px);
+      -webkit-backdrop-filter: blur(4.7px);
+      border: 1px solid rgba(210, 182, 255, 0.78);
+      padding: 8px 16px;
+      border-radius: 5px;
+      box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+      transition: 1s all;
+    }
+   .btn-nextpage:hover{
+      background-color: #b4662e;
+      color: beige;
+      font-weight: 500;
+      padding: 8px 20px;
+      font-family: "Pacifico", cursive;
+          border: none;
+    }
+    .new:hover {
+        background-color: #8b4513;
+      } */
+  </style>
+</head>
+
+<body class="">
+  <div class="player">
+    <!-- Dashboard -->
+    <div class="dashboard">
+      <!-- Header -->
+      <header>
+        <h4>Now playing:</h4>
+        <h2>String 57th & 9th</h2>
+      </header>
+
+      <!-- CD -->
+      <div class="cd">
+        <div
+          class="cd-thumb"
+          style="
+            background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg');
+          "
+        ></div>
+      </div>
+
+      <!-- Control -->
+      <div class="control">
+        <div class="btn btn-repeat">
+          <i class="fas fa-redo"></i>
+        </div>
+        <div class="btn btn-prev">
+          <i class="fas fa-step-backward"></i>
+        </div>
+        <div class="btn btn-toggle-play">
+          <i class="fas fa-pause icon-pause"></i>
+          <i class="fas fa-play icon-play"></i>
+        </div>
+        <div class="btn btn-next">
+          <i class="fas fa-step-forward"></i>
+        </div>
+        <div class="btn btn-random">
+          <i class="fas fa-random"></i>
+        </div>
+      </div>
+
+      <input
+        id="progress"
+        class="progress"
+        type="range"
+        value="0"
+        step="1"
+        min="0"
+        max="100"
+      />
+
+      <audio id="audio" preload="" src=""></audio>
+    </div>
+
+    <!-- Playlist -->
+    <div class="playlist animate__slideInUp"></div>
+    <!--<a class=" btn-nextpage" href="harrypotter.html"> Adventure ? </a>-->
+  </div>
+
+  <!-- Intro.js Script -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/intro.js/minified/intro.min.js"></script> -->
+  <script>
+    introJs()
+      .setOptions({
+        steps: [
+          {
+            element: ".click-icon",
+            intro: ` <p>It's small project <strong>hope you all like it ! </strong> </br> Incase it's not working do below  given trick (refresh the page). </br></br> </p> <video   width="250" height="250" autoplay="true"  controls> <source autoplay="true"  src="introvid.mp4" type="video/mp4"> Your browser does not support the video tag. </video> `,
+          },
+        ],
+        showProgress: false,
+        showBullets: false,
+        nextLabel: "Next →",
+        prevLabel: "← Back",
+        doneLabel: "Done ✨",
+      })
+      .start();
+  </script>
+
+  <script>
+    const $ = document.querySelector.bind(document);
+    const $$ = document.querySelectorAll.bind(document);
+
+    const PLAYER_STORAGE_KEY = "MUSIC_PLAYER_TienHieu";
+
+    const player = $(".player");
+    const cd = $(".cd");
+    const heading = $("header h2");
+    const cdThumb = $(".cd-thumb");
+    const audio = $("#audio");
+    const playBtn = $(".btn-toggle-play");
+    const progress = $("#progress");
+    const prevBtn = $(".btn-prev");
+    const nextBtn = $(".btn-next");
+    const randomBtn = $(".btn-random");
+    const repeatBtn = $(".btn-repeat");
+    const playlist = $(".playlist");
+
+    const app = {
+      //Lấy ra chỉ mục đầu tiên của mảng
+      currentIndex: 0,
+      isPlaying: false,
+      isRandom: false,
+      isRepeat: false,
+      config: JSON.parse(localStorage.getItem(PLAYER_STORAGE_KEY)) || {},
+      songs: [
+        {
+          name: " Yun Hi",
+
+          singer: "Mohit chauhan",
+          path: "https://harshu1296.github.io/janhvimusicplayer/yun%20hi.mp3",
+          image: "https://harshu1296.github.io/gifs/yun%20hi.gif",
+        },
+        {
+          name: " Heeriye Prism",
+          singer: "Arijit Singh, Shreya Ghoshal",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Arijit%20Singh_%20Heeriye%20_%20Shreya%20Ghoshal,%20Himesh%20Reshammiya-[AudioTrimmer.com].mp3",
+          image: "https://harshu1296.github.io/gifs/heeriye.gif",
+        },
+
+        // her image
+        {
+          name: "Chand Baliyan",
+          singer: "Aaditya A ",
+          path: " https://harshu1296.github.io/janhvimusicplayer/chand%20baliyan.mp3   ",
+          image:
+            "https://harshu1296.github.io/janhvimusicplayer/chandbaliyanfinal.jpg",
+        },
+
+        // her image
+
+        {
+          name: " pretty little baby",
+
+          singer: "Connie Francis",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Pretty%20Little%20Baby.mp3",
+          image:
+            "https://harshu1296.github.io/janhvimusicplayer/pretty%20little%20baby.jpg",
+        },
+
+        {
+          name: "Tu Hi Mera",
+          singer: "Shafqat Amanat Ali",
+          path: "https://harshu1296.github.io/janhvimusicplayer/tuhimeraprism.mp3",
+          image: "https://harshu1296.github.io/gifs/tu%20hi%20mera%20prism.gif",
+        },
+
+        {
+          name: " Alag Aasmann",
+
+          singer: "Harshvardhan",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Alag%20aasman%20cover%20by%20me%20.mp3",
+          image:
+            "https://harshu1296.github.io/janhvimusicplayer/alag%20aasman.jpg",
+        },
+        {
+          name: "Kinna Sona Prism",
+          singer: "Sunil Kamath ",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Kinna%20Sona%20Full%20AUDIO%20Song%20-%20Sunil%20Kamath%20_%20Bhaag%20Johnny%20_%20Kunal%20Khemu%20_%20T-Series-[AudioTrimmer.com].mp3",
+          image: "https://harshu1296.github.io/gifs/kinna%20sona.gif",
+        },
+        {
+          name: "Darasal",
+          singer: "Atif Aslam",
+          path: "https://harshu1296.github.io/janhvimusicplayer/darasal.mp3",
+          image: "https://harshu1296.github.io/gifs/Qafirana.gif",
+        },
+
+        {
+          name: "Tere Naina",
+          singer: "Shankar Eshan Loy",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Shankar%20Eshan%20Loy%20-%20Tere%20Naina%20Lyric%20Video%20-%20My%20Name%20is%20Khan%20_%20Shahrukh%20Khan%20_%20Kajol.mp3",
+         
+          image: "https://harshu1296.github.io/gifs/tere%20naina.gif",
+        },
+
+        {
+          name: "Chaudhary",
+
+          singer: "Amit Trivedi , Mame khan ",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Chaudhary.mp3",
+
+          image: "https://harshu1296.github.io/gifs/chaudhary%20best.gif",
+        },
+       {
+          name: "Vaaroon",
+
+          singer: "Aanand Baskar,Romy",
+          path: "Vaaroon.mp3",
+          image: "alag aasman.jpg",
+        },
+        {
+          name: "Ajab sii..",
+          singer: " K Kunnath ",
+          path: "Aankhon Mein Teri Ajab Si (Lyrical) Om Shanti Om _ K.K. _ Shahrukh Khan _ Deepika Padukone.mp3",
+          image: "https://harshu1296.github.io/gifs/aankhometeri.gif",
+        },
+
+        {
+          name: " Heeriye..",
+          singer: "Arijit Singh, Shreya Ghoshal",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Arijit%20Singh_%20Heeriye%20_%20Shreya%20Ghoshal,%20Himesh%20Reshammiya.mp3",
+          image: "https://harshu1296.github.io/gifs/heeriye.gif",
+        },
+        {
+          name: "Surili Akhiyon Wale",
+          singer: "Rahat Fateh Ali khan",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Surili%20Akhiyon%20Wale%20Full%20(Video)%20-%20Veer_Salman%20Khan_Zarine%20Khan_Rahat%20Fateh%20Ali%20Khan.mp3",
+          image:
+            "https://harshu1296.github.io/gifs/sureli%20ankhiyon%20wale.gif",
+        },
+
+        {
+          name: "Mere Liye Tum Kaafi Ho",
+          singer: "Ayushman Khurana , Tanishk , Vayu",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Mere%20Liye%20Tum%20Kaafi%20Ho%20Song%20_%20Shubh%20Mangal%20Zyada%20Saavdhan%20_%20Ayushman%20Khurana,Jeetu%20_%20Tanishk%20-%20Vayu.mp3",
+          image: "https://harshu1296.github.io/gifs/mereliyetumkafiho.gif",
+        },
+        {
+          name: "Aaj Na",
+          singer: "Ritviz",
+          path: "https://harshu1296.github.io/janhvimusicplayer/aajna.mp3",
+          image: "https://harshu1296.github.io/gifs/tu%20aesa%20kaise%20h.gif",
+        },
+
+        {
+          name: "Maahi ve..",
+          singer: "A.R. Rehman",
+          path: "https://harshu1296.github.io/janhvimusicplayer/maahive.mp3",
+          image: "https://i.ytimg.com/vi/S1aQhVUy_9g/maxresdefault.jpg",
+        },
+        ,
+        {
+          name: "Jogi prism",
+          singer: " Arko ft Aakanksha Sharma , Yaseer Desai",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Jogi%20-%20Lyrical%20_%20Shaadi%20Mein%20Zaroor%20Aana%20_%20Rajkummar%20Rao,%20Kriti%20Kharbanda%20_%20Arko%20ft%20Aakanksha%20Sharma-[AudioTrimmer.com].mp3",
+          image: "https://harshu1296.github.io/gifs/jogi.gif",
+        },
+
+        {
+          name: "I love you",
+          singer: "Mohit chauhan",
+          path: "https://harshu1296.github.io/janhvimusicplayer/I%20love%20you%20(Full%20song)%20Bodyguard%20feat.%20Salman%20khan,%20Kareena%20Kapoor.mp3",
+          image: "https://harshu1296.github.io/gifs/i%20love%20u.gif",
+        },
+        {
+          name: "Chaar Kadam",
+          singer: "Sonu nigam , Shreya Ghosal",
+          path: "https://harshu1296.github.io/janhvimusicplayer/'Chaar%20Kadam'%20FULL%20VIDEO%20Song%20_%20PK%20_%20Sushant%20Singh%20Rajput%20_%20Anushka%20Sharma%20_%20T-series.mp3",
+          image: "https://harshu1296.github.io/gifs/chaar%20kadam.gif",
+        },
+        {
+          name: "Main Hoon Saath Tere Prism",
+          singer: " Arijit Singh",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Main%20Hoon%20Saath%20Tere%20-%20Lyrical%20_%20Shaadi%20Mein%20Zaroor%20Aana%20_%20Rajkummar%20Rao,%20Kriti%20K%20_%20Arijit%20Singh-[AudioTrimmer.com].mp3",
+          image: "https://harshu1296.github.io/gifs/main%20hun%20saath%20tere%20prism.gif",
+        },
+        {
+          name: " Waste of time",
+          singer: "Sonu nigam ",
+          path: "https://harshu1296.github.io/janhvimusicplayer/'Love%20is%20a%20Waste%20of%20Time'%20FULL%20VIDEO%20SONG%20_%20PK%20_%20Aamir%20Khan%20_%20Anushka%20Sharma%20_%20T-series.mp3",
+          image: "https://harshu1296.github.io/gifs/video2.gif",
+        },
+
+        {
+          name: "Mera Mann Kehne Laga",
+          singer: "Ayushmann Khurrana",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Mera%20Mann%20Kehne%20Laga%20Full%20Song%20with%20Lyrics%20_%20Nautanki%20Saala%20_%20Ayushmann%20Khurrana,Kunaal%20Roy%20Kapur.mp3",
+          image: "https://harshu1296.github.io/gifs/mera%20mnn.gif",
+        },
+        {
+          name: " Jaan nisar Prism..",
+          singer: "Arijit singh ",
+          path: "https://harshu1296.github.io/janhvimusicplayer/jaannisarprism.mp3",
+          image: "https://harshu1296.github.io/janhvimusicplayer/Jaannisar.jpg",
+        },
+        {
+          name: "Tere Hawale..",
+          singer: "Arijit Singh",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Tere%20Hawaale%20(Full%20Video)%20Laal%20Singh%20Chaddha%20_%20Aamir,Kareena%20_%20Arijit,Shilpa%20_%20Pritam,Amitabh,Advait.mp3",
+         image: "https://harshu1296.github.io/gifs/tere%20hawale.gif",
+        },
+        {
+          name: "Hona Tha Pyar prism",
+          singer: "Atif Aslam & Mahira Khan",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Hona%20Tha%20Pyar%20Full%20Video%20-%20Bol%20_%20Atif%20Aslam%20&%20Mahira%20Khan%20_%20Atif%20Aslam%20&%20Hadiqa%20Kiani-[AudioTrimmer.com].mp3",
+          image: "https://harshu1296.github.io/gifs/hona%20tha%20pyar.gif",
+        },
+
+        {
+          name: "Main tera <333..",
+          singer: "Arijit Singh ,Pritam_ Amitabh",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Kalank%20Title%20Track%20-%20Lyrical%20_%20Alia%20Bhatt%20,%20Varun%20Dhawan%20_%20Arijit%20Singh%20_%20Pritam_%20Amitabh-[AudioTrimmer.com].mp3",
+          image: "https://harshu1296.github.io/gifs/main%20tera.gif",
+        },
+        
+        ,
+         {
+           name: "  Tere Bina ",
+           singer: "AR Rehman , Chinmayi ",
+           path: "https://harshu1296.github.io/janhvimusicplayer/tere%20bina1.mp3",
+         image: "https://harshu1296.github.io/gifs/tere%20bina.gif",
+
+         },
+        {
+          name: "Zaroor",
+          singer: "Aparshakti Khurana",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Zaroor%20%E2%80%93%20Aparshakti%20Khurana%20_%20Savi%20Kahlon%20_%20Official%20Music%20Video.mp3",
+          image: "https://harshu1296.github.io/gifs/zaroor.gif",
+        },
+
+        {
+          name: "Moh Moh Ke Dhaage Prism",
+          singer: "Papon Composed",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Moh%20Moh%20Ke%20Dhaage%20_%20Full%20Song%20_%20Dum%20Laga%20Ke%20Haisha%20_%20Ayushmann,%20Bhumi%20_%20Papon,%20Monali%20_%20Anu%20Malik-[AudioTrimmer.com].mp3",
+           image: "https://harshu1296.github.io/gifs/mohmohkedhage%20prism.gif",
+        },
+        {
+          name: "Fakira",
+          singer: "Sanam Puri",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Fakira%20_%20Sanam-[AudioTrimmer.com].mp3",
+           image: "https://harshu1296.github.io/gifs/fakira.gif",
+        },
+        {
+          name: "Pretty Woman prism",
+          singer: "Shankar Mahadevan",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Pretty%20Woman%20-%20Kal%20Ho%20Naa%20Ho%20_%20Shah%20Rukh%20Khan%20_%20Preity%20_%20Shankar%20Mahadevan%20_%20SEL%20_%204K%20Video-[AudioTrimmer.com].mp3",
+           image: "https://harshu1296.github.io/gifs/pretty%20woman%20prism.gif",
+        },
+        {
+          name: "Tere Bina ",
+          singer: "AR Rehman x Chinmayi ",
+          path: "https://harshu1296.github.io/janhvimusicplayer/tere%20bina.mp3",
+         image: "https://harshu1296.github.io/gifs/tere%20bina.gif",
+        }
+        ,
+
+        // {
+        //   name: "Bulleya",
+        //   singer: "Papon ",
+        //   path: "Bulleya _ Full Song _ Sultan _ Salman Khan, Anushka Sharma _ Papon _ Vishal & Shekhar _ Irshad Kamil.mp3",
+        //  image: "video1.gif",
+
+        // },
+        {
+          name: " Channa ve..",
+
+          singer: "Akhil Sachdeva",
+          path: "https://harshu1296.github.io/janhvimusicplayer/canna%20ve.mp3",
+        image: "https://harshu1296.github.io/gifs/channa%20ve.gif",
+        }
+          ,
+        {
+          name: " Lutt Putt gya",
+
+          singer: "Arijit Singh",
+          path: "https://harshu1296.github.io/janhvimusicplayer/lutt%20putt%20gya.mp3",
+
+         image: "https://harshu1296.github.io/gifs/lutt%20putt%20gya.gif",
+        }
+        ,
+        {
+          name: "Raanjhanaa",
+          singer: "A.R. Rahman",
+          path: "A.R. Rahman - Raanjhanaa (Lyric Video).mp3",
+           image: "alag aasman.jpg",
+        }
+        ,
+        {
+          name: "Dooriyan",
+          singer: "Mohit Chauhan",
+          path: "DOORIYAN - Full Audio Song - Love Aaj Kal _ Saif Ali Khan _ Mohit Chauhan _ Pritam.mp3",
+        image: "https://harshu196.github.io/gifs/dooriyan.gif",
+        }
+        ,
+        {
+          name: "Mast Magan",
+          singer: "Arijit Singh ",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Mast%20Magan%20FULL%20Video%20Song%20_%202%20States%20_%20Arijit%20Singh%20_%20Arjun%20Kapoor,%20Alia%20Bhatt.mp3",
+          image: "https://harshu1296.github.io/gifs/mastmalang.gif",
+        },
+
+        {
+          name: "Lutt Putt gya",
+
+          singer: "Arijit Singh",
+          path: "https://harshu1296.github.io/janhvimusicplayer/lutt%20putt%20gya%202.mp3",
+
+        image: "https://harshu1296.github.io/gifs/lutt%20putt%20gya2.gif",
+        }
+        ,
+
+        {
+          name: "Tum Tak ",
+          singer: "A.R. Rahman",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Tum%20Tak%20_%20Full%20Video%20Song%20_%20Raanjhanaa.mp3",
+          image: "https://harshu1296.github.io/gifs/tumtak.gif",
+        },
+
+        {
+          name: "Tum Se Hi",
+          singer: "Mohit Chauhan , Pritam",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Full%20Video_%20Tum%20Se%20Hi%20_%20Jab%20We%20Met%20_%20Kareena%20Kapoor,%20Shahid%20Kapoor%20_%20Mohit%20Chauhan%20_%20Pritam.mp3",
+          image: "https://i.ytimg.com/vi/LFKEFl3w5nc/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGEkgTyhlMA8=&rs=AOn4CLCVzlBHsUJDnQbolRr3QtokKcMRwg",
+        },
+
+        {
+          name: "Aashiyan",
+          singer: "Pritam , Shreya Ghosal",
+          path: "https://harshu1296.github.io/janhvimusicplayer/assiyanprism.mp3",
+        image: "https://harshu1296.github.io/gifs/aasiyan.gif",
+        }
+        ,
+        {
+          name: " Qafirna..",
+          singer: "Arijit singh ",
+          path: "https://harshu1296.github.io/janhvimusicplayer/Qaafirana%20_%20Kedarnath%20_%20Sushant%20Rajput%20_%20Sara%20Ali%20Khan%20_%20Arijit%20Singh%20&%20Nikhita%20_%20Amit%20Trivedi.mp3",
+         image: " https://harshu1296.github.io/gifs/jaan%20nisar.gif     ",
+        }
+        ,
+
+        ,
+        {
+          name: "Ajeebo Gareeb",
+          singer: " Arijit Singh",
+          path: "ajeebo gareeb.mp3",
+        //image: " https://harshu1296.github.io/gifs/ajeebogareeb.gif  ",
+        },
+        {
+          name: "Mitwa",
+          singer: "Shankar Mahadevan",
+          path: "mitwa.mp3",
+         //image: " https://harshu1296.github.io/gifs/mitwa.gif   ",
+        }
+        ,
+
+      
+
+        {
+          name: "Abhi Kuch Dino Se",
+          singer: "Mohit Chauhan",
+          path: "Abhi Kuch Dino Se Lyrical Video _ Dil Toh Baccha Hai Ji _ Emraan hashmi, Ajay Devgn.mp3",
+       // image: "https://harshu1296.github.io/gifs/abhikuchdinonse.gif",
+        }
+        ,
+        {
+          name: "Ala Barfi",
+          singer: "Pritam , Mohit chauhan",
+          path: "Ala Barfi - Barfi_Pritam_Mohit Chauhan_Ranbir.mp3",
+         //image: "https://harshu1296.github.io/gifs/ala%20barfi.gif",
+        }
+        ,
+
+        {
+          name: "Dagabaaz Re",
+          singer: "Rahat Fateh Ali Khan",
+          path: "https://harshu1296.github.io/janhvimusicplayer/dagabaazPrism.mp3",
+        image: "https://harshu1296.github.io/gifs/daga%20baz%20re.gif",
+        }
+        ,
+        
+
+        {
+          name: "Perfect",
+          singer: "ED Sheeran",
+          path: "Ed Sheeran - Perfect.mp3",
+          image: "perfect.jpg",
+        },
+
+        {
+          name: "Zara Si Sawari hai woh",
+          singer: "Arijit , krishnan",
+          path: "full song Zara Si Sawari hai woh amazing song love diary Arijit.mp3",
+        image: "https://harshu1296.github.io/gifs/sawri%20h%20vo.gif",
+        }
+        ,
+
+        {
+          name: "Haule Haule",
+          singer: "Sukhwinder Singh",
+          path: "Haule Haule - Full Song _ Rab Ne Bana Di Jodi _ Shah Rukh Khan _ Anushka Sharma _ Sukhwinder Singh.mp3",
+           image: "https://harshu1296.github.io/gifs/haule%20haule.gif",
+        },
+        {
+          name: "Hona Tha Pyar",
+          singer: "Atif Aslam & Mahira Khan",
+          path: "Hona Tha Pyar Full Video - Bol _ Atif Aslam & Mahira Khan _ Atif Aslam & Hadiqa Kiani.mp3",
+           image: "https://harshu1296.github.io/gifs/hona%20tha%20pyar.gif",
+        },
+
+        {
+          name: "Jag Ghoomeya",
+          singer: "Rahat Fateh Ali Khan",
+          path: "Jag Ghoomeya Full Song _ SULTAN _ Salman Khan, Anushka Sharma _ Rahat Fateh Ali Khan, Vishal-Shekhar.mp3",
+         image: "https://harshu1296.github.io/gifs/jag%20ghumeya.gif",
+        }
+        ,
+
+        {
+          name: "Jogi",
+          singer: " Arko ft Aakanksha Sharma , Yaseer Desai",
+          path: "Jogi - Lyrical _ Shaadi Mein Zaroor Aana _ Rajkummar Rao, Kriti Kharbanda _ Arko ft Aakanksha Sharma.mp3",
+          image: "https://harshu1296.github.io/gifs/jogi.gif",
+        },
+        {
+          name: "Jugraafiya",
+          singer: "Udit Narayan & Shreya Ghoshal",
+          path: "Jugraafiya - Full Video _ Super 30 _ Hrithik Roshan & Mrunal Thakur _ Udit Narayan & Shreya Ghoshal.mp3",
+         image: "https://harshu1296.github.io/gifs/jugarfiyaa.gif",
+        }
+        ,
+        {
+          name: "Kahin Na Lage Mann",
+          singer: "Mohit Chauhan,Pritam",
+          path: "Kahin Na Lage Mann - Is This Love - Kismat Konnection - Mohit Chauhan _ Pritam.mp3",
+        image: "https://harshu1296.github.io/gifs/kahinna%20lagemnn.gif",
+        }
+        ,
+        {
+          name: "Kalank Title",
+          singer: "Arijit Singh ,Pritam_ Amitabh",
+          path: "Kalank Title Track - Lyrical _ Alia Bhatt , Varun Dhawan _ Arijit Singh _ Pritam_ Amitabh-[AudioTrimmer.com].mp3",
+        image: "harshu1296.github.io/gifs/main%20tera.gif",
+        }
+        ,
+        {
+          name: "O Rangrez",
+          singer: "Javed Bashir",
+          path: "O Rangrez - Lyrical Video _ Bhaag Milkha Bhaag _ Farhan, Sonam _ Shreya Ghoshal, Javed Bashir.mp3",
+          image: "tuhimera.jpg",
+        },
+          {
+        name: "Kalank",
+         singer: "Arijit Singh ,Pritam_ Amitabh",
+         path: "Kalank Title Track - Lyrical _ Alia Bhatt , Varun Dhawan _ Arijit Singh _ Pritam_ Amitabh.mp3",
+        image: "https://harshu1296.github.io/gifs/kalank%20best.gif",
+         },
+        {
+          name: "Kinna Sona",
+          singer: "Sunil Kamath ",
+          path: "Kinna Sona Full AUDIO Song - Sunil Kamath _ Bhaag Johnny _ Kunal Khemu _ T-Series.mp3",
+          image: "kinnasona.jpg",
+        }
+         ,
+        {
+          name: "Kashmir Main..",
+          singer: "Arijit Singh , Sunidhi chauhan ",
+          path: "kashmirorg.mp3",
+           image: "https://harshu1296.github.io/gifs/kashmirmain.gif",
+          image: "char kadam.jpg",
+        },
+
+        ,
+        {
+          name: "Kyon",
+          singer: "Pritam ,Papon ,Sunidhi",
+          path: "Kyon - Barfi_Pritam_Papon_Sunidhi_Ranbir_Priyanka.mp3",
+           image: "https://harshu1296.github.io/gifs/kyon.gif",
+        },
+        {
+          name: "Dildara ",
+          singer: " aShafqat Amanat Ali",
+          path: "Lyrical Video_ Dildara Song _ Ra.One _ ShahRukh Khan, Kareena Kapoor.mp3",
+        image: "https://harshu1296.github.io/gifs/dildara.gif",
+        },
+        {
+          name: "Agar tum Kaho..",
+          singer: "kumar sanu , Alka Yagnik",
+          path: "Main Koi Aisa Geet Gaoon - HD VIDEO _ Shah Rukh Khan & Juhi Chawla _ Yes Boss _ 90's Romantic Songs.mp3",
+          image: "char kadam2.jpg",
+        },
+        {
+          name: "O Meri Laila..",
+          singer: " Atif Aslam ",
+          path: "O Meri Laila - Lyrical _ Laila Majnu _ Jyotica Tangri _ Avinash Tiwary & Tripti Dimri.mp3",
+          image: "kinnasona.jpg",
+        },
+        {
+          name: "Main Parwaana",
+          singer: "A. R. Rahman",
+          path: "Main Parwaana - Full Video _ Pippa _ Ishaan & Leysan _ Arijit Singh _ A. R. Rahman _ Shellee.mp3",
+         image: "parwana.jpg",
+        }
+        ,
+
+        {
+          name: "MATARGASHTI",
+          singer: "Mohit Chauhan",
+          path: "MATARGASHTI full VIDEO Song _ TAMASHA Songs 2015 _ Ranbir Kapoor, Deepika Padukone _ T-Series.mp3",
+        image: "https://harshu1296.github.io/gifs/matargasti.gif",
+        }
+        ,
+
+        {
+          name: "Moh Moh Ke Dhaage",
+          singer: "Papon Composed",
+          path: "Moh Moh Ke Dhaage _ Full Song _ Dum Laga Ke Haisha _ Ayushmann, Bhumi _ Papon, Monali _ Anu Malik.mp3",
+        image: "https://harshu1296.github.io/gifs/moh%20moh%20ke%20dhage.gif",
+        }
+        ,
+
+        {
+          name: "Sawaar Loon",
+          singer: "Monali Thakur",
+          path: "Monali Thakur - Sawaar Loon (Lyrics) _ Lootera.mp3",
+        image: "https://harshu1296.github.io/gifs/sawaar%20loo.gif",
+        }
+        ,
+        {
+          name: "Naina Da Kya Kasoor",
+          singer: "Amit Trivedi",
+          path: "Naina Da Kya Kasoor - Full Video _ AndhaDhun _ Ayushmann Khurrana _ Radhika Apte _ Amit Trivedi.mp3",
+          image: "https://harshu1296.github.io/gifs/nainadakyakasoor.gif",
+        },
+
+        {
+          name: "Tu Aisa Kaise Hai",
+          singer: "Osho Jain",
+          path: "tu aesa kaise h.mp3",
+        image: "https://harshu1296.github.io/gifs/tu%20aesa%20kaise%20h.gif",
+        }
+        ,
+        {
+          name: "Phir Le Aya Dil",
+          singer: "Pritam , Arijit",
+          path: "Phir Le Aya Dil - Redux - Barfi_Pritam_Arijit Singh_Ranbir_Priyanka_Ileana D'Cruz.mp3",
+         image: "https://harshu1296.github.io/gifs/fir%20leaaya%20dil.gif",
+        }
+        ,
+        {
+          name: "Piyu Bole",
+          singer: "Sonu Nigam , Shreya Ghoshal",
+          path: "Piyu Bole _ Parineeta _ Saif Ali Khan & Vidya Balan _ Sonu Nigam & Shreya Ghoshal.mp3",
+        image: "https://harshu1296.github.io/gifs/piyubole.gif",
+        }
+        ,
+
+        {
+          name: "Tu Hi Mera",
+          singer: "Shafqat Amanat Ali",
+          path: "Pritam, Shafqat Amanat Ali - Tu Hi Mera (Full Song Video).mp3",
+          image: "tuhimera.jpg",
+        },
+        {
+          name: "Pretty Woman",
+          singer: "Shankar Mahadevan",
+          path: "Pretty Woman - Kal Ho Naa Ho _ Shah Rukh Khan _ Preity _ Shankar Mahadevan _ SEL _ 4K Video.mp3",
+        image: "https://harshu1296.github.io/gifs/pretty%20woman.gif",
+        },
+        {
+          name: "Qaafirana",
+          singer: "Arijit Singh & Nikhita",
+          path: "Qaafirana _ Kedarnath _ Sushant Rajput _ Sara Ali Khan _ Arijit Singh & Nikhita _ Amit Trivedi.mp3",
+        image: "https://harshu1296.github.io/gifs/Qafirana.gif",
+        }
+        ,
+        {
+          name: "Line Without a Hook",
+          singer: "Ricky Montgomery",
+          path: "Ricky Montgomery - Line Without a Hook (Official Music Video).mp3",
+        image: "https://harshu1296.github.io/gifs/tu%20aesa%20kaise%20h.gif",
+        }
+        ,
+        {
+          name: "Kun Faya Kun",
+          singer: "A.R. Rahman, Javed Ali, Mohit Chauhan",
+          path: "ROCKSTAR_ Kun Faya Kun (Full Video Song) _ Ranbir Kapoor _ A.R. Rahman, Javed Ali, Mohit Chauhan.mp3",
+        image: "https://harshu1296.github.io/gifs/kun%20faya%20kun.gif",
+        }
+        ,
+
+        {
+          name: "Saudebaazi",
+          singer: "  Javed Ali , Pritam",
+          path: "Saudebaazi - (Lyrics) _ Lyrical Bam Hindi.mp3",
+        image: "https://harshu1296.github.io/gifs/saudebazi.gif",
+        }
+        ,
+        {
+          name: "Sun Re Sajania",
+          singer: "Ali Zafar",
+          path: "Sun Re Sajania HD Ali Zafar.mp3",
+        image: "https://harshu1296.github.io/gifs/sun%20re%20sajaniya.gif",
+        }
+        ,
+        {
+          name: "Surili Akhiyon Wale",
+          singer: "Rahat Fateh Ali khan",
+          path: "Surili Akhiyon Wale Full (Video) - Veer_Salman Khan_Zarine Khan_Rahat Fateh Ali Khan.mp3",
+        image:     "https://harshu1296.github.io/gifs/sureli%20ankhiyon%20wale.gif",
+        }
+        ,
+        ,
+
+        ,
+        {
+          name: "Every Breath You Take",
+          singer: "The Police",
+          path: "The Police - Every Breath You Take (Official Music Video).mp3",
+        //   image:"https://harshu1296.github.io/gifs/every%20breath%20you%20take.gif",
+        },
+        ,
+        {
+          name: "There Is a Light That Never Goes..",
+          singer: " Remaster",
+          path: "There Is a Light That Never Goes Out (2011 Remaster).mp3",
+        image: "https://harshu1296.github.io/gifs/double%20decker%20bus.gif",
+        }
+        ,
+
+         {
+           name: "UFF",
+           singer: "Benny dayal , Vishal Shekhar ",
+           path: "UFF Full Video _ BANG BANG! _ Hrithik Roshan & Katrina Kaif _ HD.mp3",
+        image: "video1.gif",
+
+         },
+         {
+           name: "Wat Wat Wat ",
+           singer: "Arijit Singh",
+           path: "Wat Wat Wat.mp3",
+        image: "wat wat wat - CROP - TRIM - Videobolt.net.gif",
+
+         },
+
+        {
+          name: "You Are My Soniya",
+          singer: "sonunigam",
+          path: "You Are My Soniya - K3G _ Kareena Kapoor _ Hrithik Roshan _@sonunigam _ @alkayagnik3875 _ 4K.mp3",
+        image: "https://harshu1296.github.io/gifs/youaremysoniyan.gif",
+        }
+        ,
+        {
+          name: "blue",
+          singer: "yung kai",
+          path: "yung kai - blue (official music video).mp3",
+        //   image: "https://harshu1296.github.io/gifs/blue.gif",
+        },
+
+         {
+           name: "Zehnaseeb",
+           singer: "Sidharth , Chinmayi",
+           path: "Zehnaseeb Lyric Video - Hasee Toh Phasee_Parineeti, Sidharth_Chinmayi S, Shekhar Ravjiani.mp3",
+         image: "video1.gif",
+
+         },
+
+        {
+          name: " blue Prism",
+          singer: "Yung Kai ",
+          path: "Blue-Yung-Kai-[AudioTrimmer.com].mp3",
+           image: "janhvi.jpg",
+        }
+         ,
+        ,
+        {
+          name: "Main Hoon Saath Tere",
+          singer: " Arijit Singh",
+          path: "Main Hoon Saath Tere - Lyrical _ Shaadi Mein Zaroor Aana _ Rajkummar Rao, Kriti K _ Arijit Singh.mp3",
+        //   image: "https://harshu1296.github.io/gifs/main%20hun%20saath%20tere.gif",
+        },
+        {
+          name: "Wat Wat Wat Prism",
+          singer: "Arijit Singh",
+          path: "Wat Wat Wat-[AudioTrimmer.com].mp3",
+        //   image: "https://harshu1296.github.io/gifs/wat%20wat%20wat.gif",
+        }
+        ,
+        {
+          name: "Tera Rastaa ",
+          singer: "Arijit",
+         path: "Tera Rastaa Chennai Express Full Video Song HD Shahrukh Khan, Deepika Padukone.mp3",
+        image:"char kadam.jpg",
+        }
+      ],
+
+      setConfig: function (key, value) {
+        this.config[key] = value;
+        localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config));
+      },
+
+      render: function () {
+        const htmls = this.songs.map((song, index) => {
+          return `
+        <div class="song ${
+          index === this.currentIndex ? "active" : ""
+        }" data-index="${index}">
+            <div class="thumb"
+                style="background-image: url('${song.image}')">
+            </div>
+            <div class="body">
+                <h3 class="title">${song.name}</h3>
+                <p class="author">${song.singer}</p>
+            </div>
+            <div class="option">
+                <i class="fas fa-ellipsis-h"></i>
+            </div>
+        </div>
+    `;
+        });
+        playlist.innerHTML = htmls.join("");
+      },
+
+      defineProperties: function () {
+        Object.defineProperty(this, "currentSong", {
+          get: function () {
+            return this.songs[this.currentIndex];
+          },
+        });
+      },
+
+      handleEvents: function () {
+        const _this = this;
+
+        //Lấy ra kích thước mặc định của CD
+        const cdWidth = cd.offsetWidth;
+
+        //Xử lý  CD quay và dừng
+        const cdThumbAnimate = cdThumb.animate(
+          [{ transform: "rotate(720deg)" }],
+          {
+            duration: 12000, //10 seconds
+            itetations: Infinity,
+          }
+        );
+        cdThumbAnimate.pause();
+
+        // Xử lý phóng to thu nhỏ CD
+        (document.onscroll = function () {
+          const scrollTop =
+            window.scrollY || document.documentElement.scrollTop;
+          const newCdWidth = cdWidth - scrollTop; //Kích thước cd trừ đi kích thước kéo lên để tính ra kích thước cần giảm
+
+          cd.style.width = newCdWidth > 0 ? newCdWidth + "px" : 0;
+          cd.style.opacity = newCdWidth / cdWidth;
+        }),
+          //Xử lý khi click play
+          (playBtn.onclick = function () {
+            if (_this.isPlaying) {
+              audio.pause();
+            } else {
+              audio.play();
+            }
+          });
+
+        //Khi song được play
+        audio.onplay = function () {
+          _this.isPlaying = true;
+          player.classList.add("playing");
+          cdThumbAnimate.play();
+        };
+
+        //Khi song bị pause
+        audio.onpause = function () {
+          _this.isPlaying = false;
+          player.classList.remove("playing");
+          cdThumbAnimate.pause();
+        };
+
+        //Khi tiến độ bài hát thay đổi
+        audio.ontimeupdate = function () {
+          if (audio.duration) {
+            const progressPercent = Math.floor(
+              (audio.currentTime / audio.duration) * 100
+            );
+            progress.value = progressPercent;
+          }
+        };
+
+        //Xử lý khi tua song
+        progress.onchange = function (e) {
+          const seekTime = (audio.duration / 100) * e.target.value;
+          audio.currentTime = seekTime;
+        };
+
+        //Khi next song
+        nextBtn.onclick = function () {
+          if (_this.isRandom) {
+            _this.randomSong();
+          } else {
+            _this.nextSong();
+          }
+          audio.play();
+          _this.render();
+          _this.scrollToActiveSong();
+        };
+
+        //Khi prev song
+        prevBtn.onclick = function () {
+          if (_this.isRandom) {
+            _this.randomSong();
+          } else {
+            _this.prevSong();
+          }
+          audio.play();
+          _this.render();
+        };
+
+        //Xử lý bật tắt random Song
+        randomBtn.onclick = function (e) {
+          _this.isRandom = !_this.isRandom;
+          _this.setConfig("isRandom", _this.isRandom);
+          randomBtn.classList.toggle("active", _this.isRandom);
+        };
+
+        //Xử lý lặp lại một Song
+        repeatBtn.onclick = function (e) {
+          _this.isRepeat = !_this.isRepeat;
+          _this.setConfig("isRepeat", _this.isRepeat);
+          repeatBtn.classList.toggle("active", _this.isRepeat);
+        };
+
+        //Xử lý next song khi audio ended
+        audio.onended = function () {
+          if (_this.isRepeat) {
+            audio.play();
+          } else {
+            nextBtn.click();
+          }
+        };
+        // Lắng nghe hành vi click vào playlist
+        playlist.onclick = function (e) {
+          const songNode = e.target.closest(".song:not(.active)");
+
+          if (songNode || e.target.closest(".options")) {
+            //Xử lý click vào song
+            if (songNode) {
+              _this.currentIndex = Number(songNode.dataset.index);
+              _this.loadCurrentSong();
+              audio.play();
+              _this.render();
+            }
+            //Xử lý khi click vào song options
+            if (e.target.closest(".options")) {
+            }
+          }
+        };
+      },
+
+      scrollToActiveSong: function () {
+        setTimeout(() => {
+          $(".song.active").scrollIntoView({
+            behavior: "smooth",
+            block: "nearest",
+          });
+        }, 200);
+      },
+
+      loadCurrentSong: function () {
+        heading.textContent = this.currentSong.name;
+        cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
+        audio.src = this.currentSong.path;
+      },
+
+      loadConfig: function () {
+        this.isRandom = this.config.isRandom;
+        this.isRepeat = this.config.isRepeat;
+      },
+
+      nextSong: function () {
+        this.currentIndex++;
+
+        if (this.currentIndex >= this.songs.length) {
+          this.currentIndex = 0;
+        }
+        this.loadCurrentSong();
+      },
+
+      prevSong: function () {
+        this.currentIndex--;
+        if (this.currentIndex < 0) {
+          this.currentIndex = this.songs.length - 1;
+        }
+        this.loadCurrentSong();
+      },
+
+      randomSong: function () {
+        let newIndex;
+        do {
+          newIndex = Math.floor(Math.random() * this.songs.length);
+        } while (newIndex === this.currentIndex);
+
+        this.currentIndex = newIndex;
+        this.loadCurrentSong();
+      },
+
+      start: function () {
+        //Gán cấu hình từ config vào ứng dụng
+        this.loadConfig();
+        // Định nghĩa các thuộc tính cho object
+        this.defineProperties();
+
+        // Lắng nghe / xử lý các sự kiện (DOM Events)
+        this.handleEvents();
+
+        // Tải thông tin bài đầu tiên vào UI khi chạy ứng dụng
+        this.loadCurrentSong();
+
+        // Render playlists
+        this.render();
+
+        //Hiển thị trạng thái ban đầu của button
+        randomBtn.classList.toggle("active", this.isRandom);
+        repeatBtn.classList.toggle("active", this.isRepeat);
+      },
+    };
+
+    app.start = function () {
+      this.loadConfig();
+      this.defineProperties();
+      this.handleEvents();
+      this.loadCurrentSong();
+      this.render();
+      randomBtn.classList.toggle("active", this.isRandom);
+      repeatBtn.classList.toggle("active", this.isRepeat);
+    };
+
+    app.start();
+
+    //########################### this added in last
+
+    // Preload audio files
+    function preloadAudio() {
+      app.songs.forEach((song) => {
+        const audio = new Audio();
+        audio.src = song.path;
+        audio.preload = "auto";
+      });
+    }
+
+    // Call this after defining your songs
+    preloadAudio();
+
+    //  app.start();
+  </script>
+</body>
